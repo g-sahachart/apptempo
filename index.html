@@ -43,13 +43,20 @@
   }
   .container { max-width: 1100px; margin: 0 auto; padding: 20px 14px; }
   h1 { font-size: 22px; margin: 0 0 16px; font-weight: 600; }
-  .input-row { display: flex; gap: 8px; margin-bottom: 18px; }
+  .input-row { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+  .input-row .top { display: flex; gap: 8px; }
   #title {
     flex: 1; padding: 10px 14px; font-size: 16px;
     border: 1px solid var(--border); border-radius: 8px;
     background: var(--card); color: var(--fg); outline: none;
   }
-  #title:focus { border-color: var(--accent); }
+  #title:focus, #desc:focus { border-color: var(--accent); }
+  #desc {
+    width: 100%; padding: 10px 14px; font-size: 14px;
+    border: 1px solid var(--border); border-radius: 8px;
+    background: var(--card); color: var(--fg); outline: none;
+    resize: vertical; min-height: 60px; font-family: inherit;
+  }
   #add {
     padding: 10px 18px; font-size: 16px; border: none;
     border-radius: 8px; background: var(--accent); color: #fff; cursor: pointer;
@@ -87,7 +94,7 @@
 
   .list { list-style: none; margin: 0; padding: 0; flex: 1; min-height: 40px; }
   .list li {
-    display: flex; align-items: center; gap: 8px;
+    display: flex; align-items: flex-start; gap: 8px;
     padding: 10px 10px; background: var(--card);
     border: 1px solid var(--border); border-radius: 8px;
     margin-bottom: 8px; user-select: none;
@@ -97,11 +104,17 @@
   .list li.drop-after { border-bottom: 3px solid var(--drop); }
   .handle {
     cursor: grab; color: var(--muted); font-size: 16px;
-    padding: 2px; touch-action: none; line-height: 1;
+    padding: 2px; touch-action: none; line-height: 1.4;
   }
   .handle:active { cursor: grabbing; }
-  .task-title { flex: 1; font-size: 14px; word-break: break-word; }
+  .task-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+  .task-title { font-size: 14px; word-break: break-word; line-height: 1.4; }
+  .task-desc {
+    font-size: 12px; color: var(--muted); word-break: break-word;
+    white-space: pre-wrap; line-height: 1.5;
+  }
   li.is-done .task-title { text-decoration: line-through; color: var(--muted); }
+  li.is-done .task-desc { text-decoration: line-through; }
   .delete {
     background: none; border: none; color: var(--muted);
     font-size: 20px; cursor: pointer; padding: 0 4px; line-height: 1;
@@ -117,8 +130,11 @@
   <div class="container">
     <h1>Tasks</h1>
     <div class="input-row">
-      <input id="title" type="text" placeholder="เพิ่ม task ใหม่..." autofocus>
-      <button id="add">Add</button>
+      <div class="top">
+        <input id="title" type="text" placeholder="เพิ่ม task ใหม่..." autofocus>
+        <button id="add">Add</button>
+      </div>
+      <textarea id="desc" placeholder="รายละเอียด (ไม่บังคับ) — Cmd/Ctrl+Enter เพื่อเพิ่ม" rows="2"></textarea>
     </div>
     <div class="board" id="board"></div>
   </div>
@@ -143,6 +159,7 @@
 
   const $board = document.getElementById("board");
   const $title = document.getElementById("title");
+  const $desc = document.getElementById("desc");
   const $add = document.getElementById("add");
 
   function render() {
@@ -185,9 +202,18 @@
         handle.className = "handle";
         handle.textContent = "≡";
 
-        const span = document.createElement("span");
-        span.className = "task-title";
-        span.textContent = t.title;
+        const body = document.createElement("div");
+        body.className = "task-body";
+        const titleEl = document.createElement("span");
+        titleEl.className = "task-title";
+        titleEl.textContent = t.title;
+        body.appendChild(titleEl);
+        if (t.description) {
+          const descEl = document.createElement("span");
+          descEl.className = "task-desc";
+          descEl.textContent = t.description;
+          body.appendChild(descEl);
+        }
 
         const del = document.createElement("button");
         del.className = "delete";
@@ -195,7 +221,7 @@
         del.setAttribute("aria-label", "ลบ");
         del.addEventListener("click", () => remove(t.id));
 
-        li.append(handle, span, del);
+        li.append(handle, body, del);
         attachItemDnD(li, handle);
         ul.appendChild(li);
       }
@@ -209,13 +235,17 @@
   function add() {
     const title = $title.value.trim();
     if (!title) return;
+    const description = $desc.value.trim();
     tasks.unshift({
       id: String(Date.now()) + Math.random().toString(36).slice(2, 6),
       title,
+      description,
       status: "todo",
       createdAt: Date.now(),
     });
     $title.value = "";
+    $desc.value = "";
+    $title.focus();
     save(); render();
   }
 
@@ -365,6 +395,9 @@
 
   $add.addEventListener("click", add);
   $title.addEventListener("keydown", e => { if (e.key === "Enter") add(); });
+  $desc.addEventListener("keydown", e => {
+    if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) { e.preventDefault(); add(); }
+  });
 
   render();
 </script>
