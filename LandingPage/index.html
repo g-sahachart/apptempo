@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Tempo · 30-Minute Task App</title>
+<link rel="icon" type="image/jpeg" href="Resurces/Logo.jpg">
+<style>
+  :root {
+    --bg:#f4faff; --surface:#fff; --surface-soft:#f4faff;
+    --text:#0f1d2a; --muted:#6b7d8c; --border:#e3ecf3; --hover:#f1f7fc;
+    --brand-blue:#2b8cff; --brand-cyan:#28b6d6; --brand-green:#4ed5a8;
+    --grad: linear-gradient(135deg,#2b8cff 0%,#28b6d6 55%,#5ad19a 100%);
+    --accent:#2b8cff; --accent-soft:#e3f0ff;
+    --done:#1ba673; --done-soft:#e0f6ec;
+    --danger:#ef4444; --danger-soft:#fde8e8;
+    --shadow:0 4px 14px rgba(43,140,255,.08),0 1px 3px rgba(15,29,42,.05);
+    --font:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans Thai Looped","Noto Sans Thai",sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:#0b1620; --surface:#131f2b; --surface-soft:#182636;
+      --text:#e8f1fa; --muted:#8aa0b5; --border:#21303f; --hover:#1a2837;
+      --accent-soft:#1a3050; --done-soft:#133a2c; --danger-soft:#3a1f1f;
+      --shadow:0 4px 14px rgba(0,0,0,.4),0 1px 3px rgba(0,0,0,.3);
+    }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg)}
+  body{
+    font:14px/1.5 var(--font); color:var(--text); min-height:100dvh;
+    -webkit-font-smoothing:antialiased; padding:48px 24px 80px;
+    background:
+      radial-gradient(1200px 600px at -10% -20%,rgba(43,140,255,.10),transparent 60%),
+      radial-gradient(900px 500px at 110% 0%,rgba(90,209,154,.10),transparent 60%),
+      var(--bg);
+  }
+  .wrap{max-width:720px;margin:0 auto}
+
+  header.page{display:flex;align-items:center;gap:14px;margin-bottom:24px}
+  .logo{width:44px;height:44px;flex:0 0 auto;border-radius:50%;overflow:hidden;box-shadow:0 6px 18px rgba(43,140,255,.25);background:var(--grad)}
+  .logo img{width:100%;height:100%;object-fit:cover;display:block}
+  .titles h1{font-size:22px;font-weight:800;margin:0;letter-spacing:-.02em;line-height:1.1;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .titles .meta{color:var(--muted);font-size:13px;margin-top:2px}
+  .titles .meta b{color:var(--text);font-weight:600}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:8px}
+  ul.list{list-style:none;margin:0;padding:0}
+
+  li.task{display:flex;align-items:flex-start;gap:12px;padding:12px;border-radius:10px;position:relative;transition:background .12s}
+  li.task+li.task{border-top:1px solid var(--border);border-radius:0}
+  li.task:hover{background:var(--hover)}
+  li.task:first-child{border-top-left-radius:10px;border-top-right-radius:10px}
+  li.task:last-child{border-bottom-left-radius:10px;border-bottom-right-radius:10px}
+  li.task.dragging{opacity:.35}
+  li.task.drop-before{box-shadow:inset 0 2px 0 0 var(--accent)}
+  li.task.drop-after{box-shadow:inset 0 -2px 0 0 var(--accent)}
+
+  .handle{position:absolute;left:-22px;top:12px;width:18px;height:18px;color:var(--muted);cursor:grab;opacity:0;transition:opacity .12s;user-select:none;touch-action:none;display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1}
+  li.task:hover .handle{opacity:1}
+  .handle:active{cursor:grabbing}
+  @media (max-width:520px){.handle{position:static;opacity:.5;margin-top:2px}}
+
+  .check{flex:0 0 auto;margin-top:1px;width:20px;height:20px;padding:0;border:1.5px solid #c5d2dd;border-radius:50%;background:transparent;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:background .12s,border-color .12s,transform .12s;position:relative}
+  .check:hover{border-color:var(--brand-blue);background:var(--accent-soft);transform:scale(1.05)}
+  .check svg{width:12px;height:12px;opacity:0;transition:opacity .12s}
+  .check.in_progress{border-color:var(--brand-blue);background:var(--accent-soft)}
+  .check.in_progress::after{content:"";width:8px;height:8px;border-radius:50%;background:var(--grad)}
+  .check.done{border-color:transparent;background:var(--grad)}
+  .check.done svg{opacity:1;color:#fff}
+
+  .body{flex:1;min-width:0;padding-top:1px}
+  .title{font-size:14px;color:var(--text);word-break:break-word;line-height:1.45}
+  .meta-row{display:flex;align-items:center;gap:8px;margin-top:3px;font-size:12px;color:var(--muted)}
+  .tag{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:999px;font-weight:600;font-size:11px;letter-spacing:.02em}
+  .tag.in_progress{color:var(--brand-blue);background:var(--accent-soft)}
+  .tag.done{color:var(--done);background:var(--done-soft)}
+  li.task.is-done .title{text-decoration:line-through;color:var(--muted)}
+
+  .del{flex:0 0 auto;width:22px;height:22px;border:0;background:transparent;color:var(--muted);cursor:pointer;border-radius:4px;opacity:0;transition:opacity .12s,color .12s,background .12s;display:inline-flex;align-items:center;justify-content:center}
+  li.task:hover .del{opacity:1}
+  .del:hover{color:var(--danger);background:var(--danger-soft)}
+  .del svg{width:14px;height:14px}
+
+  .composer-row{margin-top:12px}
+  .add-trigger{display:inline-flex;align-items:center;gap:10px;padding:10px 8px;border:0;background:transparent;color:var(--muted);cursor:pointer;font:inherit;border-radius:8px;width:100%;text-align:left;transition:color .12s,background .12s}
+  .add-trigger:hover{color:var(--brand-blue);background:var(--hover)}
+  .add-trigger .plus{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:var(--grad);color:#fff;font-weight:700;font-size:14px;line-height:1;box-shadow:0 2px 6px rgba(43,140,255,.30)}
+
+  form.composer{display:none;margin-top:8px;border:1.5px solid var(--brand-blue);border-radius:12px;background:var(--surface);padding:12px 14px;box-shadow:0 4px 14px rgba(43,140,255,.12)}
+  form.composer.open{display:block}
+  form.composer input{width:100%;border:0;outline:0;background:transparent;color:var(--text);font:inherit;font-weight:600;font-size:15px;padding:4px 0}
+  form.composer input::placeholder{color:var(--muted);font-weight:400}
+  form.composer .actions{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);justify-content:flex-end}
+  form.composer button{border:0;font:inherit;font-size:13px;font-weight:600;padding:8px 16px;border-radius:8px;cursor:pointer;transition:filter .12s,background .12s}
+  form.composer button.primary{background:var(--grad);color:#fff;box-shadow:0 2px 8px rgba(43,140,255,.30)}
+  form.composer button.primary:hover:not(:disabled){filter:brightness(1.05)}
+  form.composer button.primary:disabled{opacity:.5;cursor:not-allowed;box-shadow:none}
+  form.composer button.ghost{background:var(--surface-soft);color:var(--text)}
+  form.composer button.ghost:hover{background:var(--hover)}
+
+  .empty{text-align:center;color:var(--muted);padding:40px 8px 24px;font-size:13px}
+  footer.brand{text-align:center;color:var(--muted);font-size:12px;margin-top:32px;letter-spacing:.02em}
+  footer.brand .gradient{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="page">
+    <div class="logo"><img src="Resurces/Logo.jpg" alt="Tempo logo"></div>
+    <div class="titles">
+      <h1>Tempo</h1>
+      <div class="meta"><b id="count">0</b> tasks · <span>built in 30 minutes</span></div>
+    </div>
+  </header>
+  <div class="card">
+    <ul class="list" id="list" aria-label="task list"></ul>
+    <div class="composer-row">
+      <button class="add-trigger" id="addTrigger" type="button">
+        <span class="plus">+</span><span>Add a task</span>
+      </button>
+      <form class="composer" id="composer" autocomplete="off">
+        <input id="title" type="text" placeholder="Type a task…" maxlength="200" aria-label="task name">
+        <div class="actions">
+          <button class="ghost" type="button" id="cancel">Cancel</button>
+          <button class="primary" type="submit" id="add" disabled>Add task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <footer class="brand">Powered by <span class="gradient">Tempo</span> · single-file · zero ops</footer>
+</div>
+<script>
+(() => {
+  const KEY = "tasks_v1";
+  const STATES = ["todo", "in_progress", "done"];
+  const LABEL = { todo: "", in_progress: "In Progress", done: "Done" };
+  const CHECK_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 10 17 19 7"/></svg>`;
+  const TRASH_SVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/></svg>`;
+
+  let tasks = load();
+  const listEl = document.getElementById("list");
+  const countEl = document.getElementById("count");
+  const formEl = document.getElementById("composer");
+  const inputEl = document.getElementById("title");
+  const addBtn = document.getElementById("add");
+  const triggerEl = document.getElementById("addTrigger");
+  const cancelEl = document.getElementById("cancel");
+
+  function load() {
+    try {
+      const arr = JSON.parse(localStorage.getItem(KEY) ?? "[]");
+      if (!Array.isArray(arr)) throw new Error("not an array");
+      return arr.filter(t => t && typeof t.id === "string" && typeof t.title === "string" && STATES.includes(t.status));
+    } catch (e) { console.warn("tasks_v1 corrupt, resetting:", e); return []; }
+  }
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(tasks)); }
+    catch (e) { console.warn("save failed:", e); }
+  }
+  function render() {
+    listEl.innerHTML = "";
+    countEl.textContent = String(tasks.length);
+    if (tasks.length === 0) {
+      const p = document.createElement("li");
+      p.className = "empty"; p.textContent = "ยังไม่มี task — กด + Add a task เพื่อเริ่ม";
+      listEl.appendChild(p); return;
+    }
+    for (const t of tasks) listEl.appendChild(row(t));
+  }
+  function row(t) {
+    const li = document.createElement("li");
+    li.className = "task" + (t.status === "done" ? " is-done" : "");
+    li.dataset.id = t.id; li.draggable = true;
+
+    const handle = document.createElement("span");
+    handle.className = "handle"; handle.textContent = "⋮⋮";
+    handle.setAttribute("aria-label", "drag handle");
+
+    const check = document.createElement("button");
+    check.type = "button"; check.className = "check " + t.status; check.innerHTML = CHECK_SVG;
+    check.title = "คลิกเพื่อเปลี่ยน status";
+    check.addEventListener("click", () => cycleStatus(t.id));
+
+    const body = document.createElement("div");
+    body.className = "body";
+    const title = document.createElement("div");
+    title.className = "title"; title.textContent = t.title;
+    body.appendChild(title);
+    if (t.status !== "todo") {
+      const meta = document.createElement("div"); meta.className = "meta-row";
+      const tag = document.createElement("span");
+      tag.className = "tag " + t.status; tag.textContent = LABEL[t.status];
+      meta.appendChild(tag); body.appendChild(meta);
+    }
+
+    const del = document.createElement("button");
+    del.type = "button"; del.className = "del"; del.innerHTML = TRASH_SVG;
+    del.setAttribute("aria-label", "delete task"); del.title = "Delete";
+    del.addEventListener("click", () => removeTask(t.id));
+
+    li.append(handle, check, body, del);
+    attachDrag(li, handle);
+    return li;
+  }
+  function addTask(titleRaw) {
+    const title = titleRaw.trim(); if (!title) return;
+    tasks.unshift({
+      id: String(Date.now()) + Math.random().toString(36).slice(2, 6),
+      title, status: "todo", createdAt: Date.now(),
+    });
+    save(); render();
+  }
+  function cycleStatus(id) {
+    const t = tasks.find(x => x.id === id); if (!t) return;
+    t.status = STATES[(STATES.indexOf(t.status) + 1) % STATES.length];
+    save(); render();
+  }
+  function removeTask(id) {
+    const t = tasks.find(x => x.id === id); if (!t) return;
+    if (!confirm(`ลบ "${t.title}" ?`)) return;
+    tasks = tasks.filter(x => x.id !== id);
+    save(); render();
+  }
+
+  function openComposer() { formEl.classList.add("open"); triggerEl.style.display = "none"; inputEl.focus(); }
+  function closeComposer() { formEl.classList.remove("open"); triggerEl.style.display = ""; inputEl.value = ""; addBtn.disabled = true; }
+  triggerEl.addEventListener("click", openComposer);
+  cancelEl.addEventListener("click", closeComposer);
+  inputEl.addEventListener("input", () => { addBtn.disabled = inputEl.value.trim().length === 0; });
+  inputEl.addEventListener("keydown", (e) => { if (e.key === "Escape") closeComposer(); });
+  formEl.addEventListener("submit", (e) => {
+    e.preventDefault();
+    addTask(inputEl.value);
+    inputEl.value = ""; addBtn.disabled = true; inputEl.focus();
+  });
+
+  let dragId = null;
+  function clearDropMarks() {
+    listEl.querySelectorAll(".drop-before, .drop-after").forEach(el => el.classList.remove("drop-before", "drop-after"));
+  }
+  function reorder(fromId, toId, position) {
+    if (!fromId || !toId || fromId === toId) return;
+    const from = tasks.findIndex(t => t.id === fromId);
+    if (from < 0 || tasks.findIndex(t => t.id === toId) < 0) return;
+    const [moved] = tasks.splice(from, 1);
+    let insert = tasks.findIndex(t => t.id === toId);
+    if (position === "after") insert += 1;
+    tasks.splice(insert, 0, moved);
+    save(); render();
+  }
+  function attachDrag(li, handle) {
+    li.addEventListener("dragstart", (e) => {
+      dragId = li.dataset.id; li.classList.add("dragging");
+      try { e.dataTransfer.setData("text/plain", dragId); e.dataTransfer.effectAllowed = "move"; } catch {}
+    });
+    li.addEventListener("dragend", () => { li.classList.remove("dragging"); clearDropMarks(); dragId = null; });
+    li.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      if (!dragId || li.dataset.id === dragId) return;
+      const r = li.getBoundingClientRect();
+      const before = (e.clientY - r.top) < r.height / 2;
+      clearDropMarks(); li.classList.add(before ? "drop-before" : "drop-after");
+    });
+    li.addEventListener("drop", (e) => {
+      e.preventDefault();
+      const before = li.classList.contains("drop-before");
+      clearDropMarks();
+      reorder(dragId, li.dataset.id, before ? "before" : "after");
+    });
+    handle.addEventListener("pointerdown", (e) => {
+      if (e.pointerType === "mouse") return;
+      e.preventDefault();
+      dragId = li.dataset.id; li.classList.add("dragging");
+      const onMove = (ev) => {
+        const target = document.elementFromPoint(ev.clientX, ev.clientY);
+        const targetLi = target && target.closest && target.closest("li.task");
+        clearDropMarks();
+        if (targetLi && targetLi.dataset.id !== dragId) {
+          const r = targetLi.getBoundingClientRect();
+          const before = (ev.clientY - r.top) < r.height / 2;
+          targetLi.classList.add(before ? "drop-before" : "drop-after");
+        }
+      };
+      const onUp = (ev) => {
+        const target = document.elementFromPoint(ev.clientX, ev.clientY);
+        const targetLi = target && target.closest && target.closest("li.task");
+        if (targetLi && targetLi.dataset.id !== dragId) {
+          const r = targetLi.getBoundingClientRect();
+          const before = (ev.clientY - r.top) < r.height / 2;
+          reorder(dragId, targetLi.dataset.id, before ? "before" : "after");
+        }
+        li.classList.remove("dragging"); clearDropMarks(); dragId = null;
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerup", onUp);
+        window.removeEventListener("pointercancel", onUp);
+      };
+      window.addEventListener("pointermove", onMove, { passive: false });
+      window.addEventListener("pointerup", onUp);
+      window.addEventListener("pointercancel", onUp);
+    });
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>

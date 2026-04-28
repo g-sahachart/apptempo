@@ -1,0 +1,862 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tempo — ความเรียบง่าย ที่ใช้งานได้จริง</title>
+<meta name="description" content="Personal task app ในไฟล์ HTML ไฟล์เดียว ใช้งานได้ใน 30 นาที — ไม่มี backend, ไม่มี build, deploy ที่ไหนก็ได้">
+<style>
+  :root {
+    /* Jira Design System tokens */
+    --brand-50:#E9F2FF; --brand-100:#CCE0FF; --brand-200:#85B8FF;
+    --brand-300:#579DFF; --brand-400:#388BFF; --brand-500:#1D7AFC;
+    --brand-600:#0C66E4; --brand-700:#0055CC; --brand-800:#09326C; --brand-900:#082145;
+    --n-0:#FFFFFF; --n-50:#F7F8F9; --n-100:#F1F2F4; --n-200:#DCDFE4;
+    --n-300:#B3B9C4; --n-400:#8590A2; --n-500:#758195; --n-600:#626F86;
+    --n-700:#44546F; --n-800:#2C3E5D; --n-900:#172B4D; --n-1000:#091E42;
+    --success:#22A06B; --success-light:#DCFFF1; --success-dark:#216E4E;
+    --warning:#E2B203; --warning-light:#FFF7D6; --warning-dark:#7F5F01;
+    --danger:#CA3521;  --danger-light:#FFECEB;  --danger-dark:#AE2E24;
+    --discovery:#8270DB; --discovery-light:#F3F0FF;
+
+    --bg:#FFFFFF; --bg-subtle:#F7F8F9; --bg-sunken:#F1F2F4; --bg-inverse:#172B4D;
+    --text:#172B4D; --text-subtle:#44546F; --text-subtlest:#626F86;
+    --border:#DCDFE4; --border-subtle:#F1F2F4;
+
+    --r-sm:4px; --r-md:6px; --r-lg:8px; --r-xl:12px; --r-2xl:16px; --r-3xl:24px; --r-circle:9999px;
+
+    --sh-raised:0 1px 1px rgba(9,30,66,.25), 0 0 1px rgba(9,30,66,.31);
+    --sh-overlay:0 4px 8px -2px rgba(9,30,66,.25), 0 0 1px rgba(9,30,66,.31);
+    --sh-modal:0 24px 48px -12px rgba(9,30,66,.25), 0 0 1px rgba(9,30,66,.31);
+    --sh-hero:0 40px 80px -20px rgba(12,102,228,.25), 0 0 1px rgba(9,30,66,.31);
+
+    --ease:cubic-bezier(.4,0,.2,1);
+
+    --font-display:'Charlie Display','Charlie Text',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    --font-body:'Charlie Text',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    --font-mono:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,monospace;
+  }
+
+  *,*::before,*::after{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    font-family:var(--font-body);
+    font-size:16px;
+    line-height:1.55;
+    color:var(--text);
+    background:var(--bg);
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--brand-600);text-decoration:none}
+  a:hover{color:var(--brand-700)}
+  img{max-width:100%;display:block}
+
+  .container{max-width:1200px;margin:0 auto;padding:0 24px}
+  .container-narrow{max-width:880px;margin:0 auto;padding:0 24px}
+
+  /* ===== Nav ===== */
+  .nav{
+    position:sticky;top:0;z-index:200;
+    height:64px;background:rgba(255,255,255,.92);
+    backdrop-filter:saturate(180%) blur(12px);
+    border-bottom:1px solid var(--border-subtle);
+  }
+  .nav-inner{display:flex;align-items:center;height:100%;gap:32px}
+  .logo{display:inline-flex;align-items:center;gap:10px;font-family:var(--font-display);font-weight:700;font-size:20px;color:var(--text)}
+  .logo img{
+    height:40px;width:40px;border-radius:50%;object-fit:cover;
+    display:block;box-shadow:var(--sh-raised);
+  }
+  .logo-text{
+    font-family:var(--font-display);font-weight:700;font-size:20px;
+    color:var(--text);letter-spacing:-0.01em;
+  }
+  .logo-footer img{height:48px;width:48px}
+  .nav-links{display:flex;gap:4px;margin-left:24px}
+  .nav-links a{
+    padding:8px 14px;border-radius:var(--r-sm);
+    color:var(--text-subtle);font-weight:500;font-size:14px;
+  }
+  .nav-links a:hover{background:var(--bg-sunken);color:var(--text)}
+  .nav-spacer{margin-left:auto;display:flex;gap:10px;align-items:center}
+
+  /* ===== Buttons ===== */
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    height:44px;padding:0 20px;
+    font-family:var(--font-body);font-size:15px;font-weight:600;
+    border:none;border-radius:var(--r-md);cursor:pointer;
+    transition:all 200ms var(--ease);text-decoration:none;
+    white-space:nowrap;
+  }
+  .btn-sm{height:36px;padding:0 14px;font-size:14px}
+  .btn-lg{height:52px;padding:0 28px;font-size:16px}
+  .btn-primary{background:var(--brand-600);color:#fff}
+  .btn-primary:hover{background:var(--brand-700);color:#fff;transform:translateY(-1px);box-shadow:0 8px 16px -4px rgba(12,102,228,.4)}
+  .btn-primary:active{background:var(--brand-800);transform:none}
+  .btn-secondary{background:var(--n-100);color:var(--text)}
+  .btn-secondary:hover{background:var(--n-200);color:var(--text)}
+  .btn-outline{background:transparent;color:var(--text);border:1px solid var(--border)}
+  .btn-outline:hover{background:var(--bg-subtle);color:var(--text);border-color:var(--n-300)}
+  .btn-subtle{background:transparent;color:var(--text-subtle)}
+  .btn-subtle:hover{background:var(--n-100);color:var(--text)}
+
+  /* ===== HERO (centered, Todoist-style) ===== */
+  .hero{
+    position:relative;overflow:hidden;
+    padding:96px 0 0;
+    background:
+      radial-gradient(60% 60% at 50% 0%, var(--brand-50) 0%, transparent 60%),
+      var(--bg);
+    text-align:center;
+  }
+  .hero::before{
+    content:'';position:absolute;inset:0;pointer-events:none;
+    background:
+      radial-gradient(40% 40% at 90% 30%, rgba(130,112,219,.08), transparent 60%),
+      radial-gradient(30% 30% at 10% 40%, rgba(34,160,107,.06), transparent 60%);
+  }
+  .hero-inner{position:relative;z-index:1}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    padding:6px 14px;border-radius:var(--r-circle);
+    background:var(--bg);color:var(--brand-700);
+    font-size:13px;font-weight:600;letter-spacing:.01em;
+    border:1px solid var(--border);
+    box-shadow:var(--sh-raised);
+  }
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--brand-600);box-shadow:0 0 0 4px rgba(12,102,228,.15)}
+
+  h1.hero-title{
+    font-family:var(--font-display);
+    font-size:80px;line-height:1.02;letter-spacing:-0.035em;font-weight:700;
+    color:var(--text);margin:24px auto 24px;max-width:900px;
+  }
+  h1.hero-title .accent{
+    background:linear-gradient(135deg,var(--brand-600) 0%,var(--brand-400) 100%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+    font-style:italic;
+  }
+  .hero-sub{
+    font-size:20px;line-height:1.55;color:var(--text-subtle);
+    max-width:640px;margin:0 auto 36px;
+  }
+  .hero-ctas{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:center}
+  .hero-meta{
+    margin-top:20px;font-size:13px;color:var(--text-subtlest);
+    display:flex;gap:20px;justify-content:center;flex-wrap:wrap;
+  }
+  .hero-meta .check{color:var(--success);font-weight:700}
+
+  /* Hero mockup ใหญ่ใต้ headline */
+  .hero-visual{
+    margin-top:72px;padding-bottom:96px;
+    position:relative;
+  }
+  .device{
+    margin:0 auto;max-width:1080px;
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:var(--r-3xl);
+    box-shadow:var(--sh-hero);
+    overflow:hidden;
+    position:relative;
+  }
+  .device-bar{
+    display:flex;align-items:center;gap:8px;
+    padding:14px 20px;background:var(--bg-subtle);
+    border-bottom:1px solid var(--border-subtle);
+  }
+  .device-bar .dot{width:11px;height:11px;border-radius:50%}
+  .device-bar .dot.r{background:#ff5f57}
+  .device-bar .dot.y{background:#febc2e}
+  .device-bar .dot.g{background:#28c840}
+  .device-url{
+    margin:0 auto;font-family:var(--font-mono);font-size:12px;
+    color:var(--text-subtlest);background:var(--bg);
+    padding:5px 14px;border-radius:var(--r-md);border:1px solid var(--border-subtle);
+  }
+  .device-body{
+    display:grid;grid-template-columns:1.4fr 1fr;
+    min-height:480px;
+  }
+  .app-main{padding:36px 40px;border-right:1px solid var(--border-subtle)}
+  .app-main h3{
+    font-family:var(--font-display);font-size:28px;font-weight:700;
+    color:var(--text);margin:0 0 4px;letter-spacing:-0.01em;
+  }
+  .app-main .sub{color:var(--text-subtlest);font-size:14px;margin-bottom:24px}
+  .app-input{display:flex;gap:8px;margin-bottom:20px}
+  .app-input input{
+    flex:1;height:44px;padding:0 14px;
+    border:2px solid var(--border);border-radius:var(--r-md);
+    font-size:15px;font-family:var(--font-body);outline:none;
+    background:var(--bg);color:var(--text);
+  }
+  .app-input input:focus{border-color:var(--brand-400)}
+  .task-list{list-style:none;padding:0;margin:0}
+  .task{
+    display:flex;align-items:center;gap:12px;
+    padding:12px 14px;border:1px solid var(--border-subtle);
+    border-radius:var(--r-md);background:var(--bg);
+    margin-bottom:8px;transition:all 150ms var(--ease);
+  }
+  .task:hover{box-shadow:var(--sh-raised);border-color:var(--border)}
+  .task.dragging{transform:rotate(-1deg) scale(1.02);box-shadow:var(--sh-overlay);border-color:var(--brand-300)}
+  .task .grip{color:var(--n-400);cursor:grab;font-size:16px;line-height:1;user-select:none;font-family:monospace}
+  .task .title{flex:1;font-size:14px;color:var(--text)}
+  .task.done .title{text-decoration:line-through;color:var(--text-subtlest);opacity:.6}
+  .task .x{
+    width:28px;height:28px;border:none;border-radius:var(--r-sm);
+    background:transparent;color:var(--text-subtlest);cursor:pointer;
+    font-size:18px;line-height:1;
+  }
+  .task .x:hover{background:var(--danger-light);color:var(--danger-dark)}
+
+  .pill{
+    display:inline-flex;align-items:center;
+    padding:3px 10px;border-radius:var(--r-circle);
+    font-size:11px;font-weight:600;
+    text-transform:uppercase;letter-spacing:.04em;
+    cursor:pointer;user-select:none;
+  }
+  .pill.todo{background:var(--n-200);color:var(--n-700)}
+  .pill.inprogress{background:var(--brand-100);color:var(--brand-700)}
+  .pill.done{background:var(--success-light);color:var(--success-dark)}
+
+  .app-side{
+    background:var(--bg-subtle);padding:36px 28px;
+    display:flex;flex-direction:column;gap:20px;
+  }
+  .stat-card{
+    background:var(--bg);border:1px solid var(--border-subtle);
+    border-radius:var(--r-lg);padding:18px;
+  }
+  .stat-card .lab{font-size:11px;color:var(--text-subtlest);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px}
+  .stat-card .num{font-family:var(--font-display);font-size:32px;font-weight:700;color:var(--text);line-height:1;letter-spacing:-0.02em}
+  .stat-card .delta{font-size:12px;color:var(--success-dark);margin-top:6px;font-weight:600}
+  .mini-bar{display:flex;gap:4px;height:36px;align-items:flex-end;margin-top:12px}
+  .mini-bar div{flex:1;background:var(--brand-200);border-radius:2px}
+  .mini-bar div:nth-child(2){height:60%;background:var(--brand-300)}
+  .mini-bar div:nth-child(3){height:80%}
+  .mini-bar div:nth-child(4){height:45%}
+  .mini-bar div:nth-child(5){height:100%;background:var(--brand-600)}
+  .mini-bar div:nth-child(6){height:70%}
+  .mini-bar div:nth-child(7){height:55%}
+
+  /* ===== Press / Social proof strip ===== */
+  .press{padding:48px 0;border-top:1px solid var(--border-subtle);border-bottom:1px solid var(--border-subtle);background:var(--bg)}
+  .press-head{
+    text-align:center;font-size:13px;font-weight:600;color:var(--text-subtlest);
+    text-transform:uppercase;letter-spacing:.12em;margin-bottom:24px;
+  }
+  .press-row{
+    display:flex;justify-content:center;align-items:center;gap:48px;flex-wrap:wrap;
+    color:var(--text-subtle);
+  }
+  .press-row .item{
+    font-family:var(--font-display);font-weight:700;font-size:20px;
+    opacity:.5;transition:opacity 200ms var(--ease);letter-spacing:-0.01em;
+  }
+  .press-row .item:hover{opacity:.85}
+  .stars{color:var(--warning)}
+
+  /* ===== Section ===== */
+  section{padding:120px 0}
+  .section-head{text-align:center;max-width:720px;margin:0 auto 64px}
+  .section-eyebrow{
+    color:var(--brand-600);font-size:13px;font-weight:700;
+    text-transform:uppercase;letter-spacing:.12em;margin-bottom:14px;
+  }
+  .section-title{
+    font-family:var(--font-display);font-size:48px;line-height:1.1;
+    letter-spacing:-0.025em;font-weight:700;margin:0 0 18px;color:var(--text);
+  }
+  .section-title .it{font-style:italic;color:var(--brand-600)}
+  .section-sub{font-size:18px;line-height:1.55;color:var(--text-subtle);margin:0}
+
+  /* ===== Features grid (4 col) ===== */
+  .features-bg{background:var(--bg-subtle)}
+  .features{display:grid;grid-template-columns:repeat(4,1fr);gap:24px}
+  .feature{
+    background:var(--bg);border:1px solid var(--border-subtle);
+    border-radius:var(--r-xl);padding:28px;
+    transition:all 200ms var(--ease);
+  }
+  .feature:hover{box-shadow:var(--sh-overlay);transform:translateY(-3px);border-color:var(--brand-200)}
+  .feat-icon{
+    width:44px;height:44px;border-radius:var(--r-md);
+    display:grid;place-items:center;font-size:20px;font-weight:700;
+    margin-bottom:18px;
+  }
+  .feature.f-1 .feat-icon{background:var(--brand-50);color:var(--brand-700)}
+  .feature.f-2 .feat-icon{background:var(--success-light);color:var(--success-dark)}
+  .feature.f-3 .feat-icon{background:var(--warning-light);color:var(--warning-dark)}
+  .feature.f-4 .feat-icon{background:var(--discovery-light);color:#5E4DB2}
+  .feat-title{font-family:var(--font-display);font-size:18px;font-weight:600;margin:0 0 8px;color:var(--text);letter-spacing:-0.01em}
+  .feat-desc{font-size:14px;line-height:1.6;color:var(--text-subtle);margin:0}
+
+  /* ===== Demo / video block ===== */
+  .demo-wrap{
+    background:linear-gradient(180deg,var(--bg) 0%, var(--brand-50) 100%);
+    border-radius:var(--r-3xl);padding:64px 48px;text-align:center;
+    border:1px solid var(--border-subtle);
+  }
+  .demo-title{
+    font-family:var(--font-display);font-size:36px;font-weight:700;
+    letter-spacing:-0.02em;margin:0 0 12px;color:var(--text);
+  }
+  .demo-sub{font-size:16px;color:var(--text-subtle);margin:0 0 32px}
+  .demo-frame{
+    max-width:880px;margin:0 auto;
+    background:#000;border:1px solid var(--border);
+    border-radius:var(--r-2xl);overflow:hidden;
+    box-shadow:var(--sh-modal);position:relative;aspect-ratio:16/9;
+  }
+  .demo-frame video{
+    width:100%;height:100%;display:block;object-fit:cover;
+  }
+
+  /* ===== Templates / Use case tabs ===== */
+  .tpl-tabs{
+    display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:40px;
+  }
+  .tpl-tab{
+    padding:8px 16px;border-radius:var(--r-circle);
+    background:var(--bg);border:1px solid var(--border);
+    color:var(--text-subtle);font-size:14px;font-weight:500;cursor:pointer;
+    transition:all 150ms var(--ease);
+  }
+  .tpl-tab:hover{border-color:var(--brand-300);color:var(--text)}
+  .tpl-tab.active{background:var(--text);color:#fff;border-color:var(--text)}
+  .tpl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+  .tpl-card{
+    background:var(--bg);border:1px solid var(--border-subtle);
+    border-radius:var(--r-xl);overflow:hidden;
+    transition:all 200ms var(--ease);cursor:pointer;
+  }
+  .tpl-card:hover{box-shadow:var(--sh-overlay);transform:translateY(-2px)}
+  .tpl-thumb{
+    aspect-ratio:16/10;padding:20px;
+    display:flex;flex-direction:column;gap:6px;justify-content:flex-end;
+    position:relative;
+  }
+  .tpl-card:nth-child(1) .tpl-thumb{background:linear-gradient(135deg,var(--brand-50),var(--brand-100))}
+  .tpl-card:nth-child(2) .tpl-thumb{background:linear-gradient(135deg,var(--success-light),#B8F0D6)}
+  .tpl-card:nth-child(3) .tpl-thumb{background:linear-gradient(135deg,var(--discovery-light),#E0D8F8)}
+  .tpl-card:nth-child(4) .tpl-thumb{background:linear-gradient(135deg,var(--warning-light),#FFE9A1)}
+  .tpl-card:nth-child(5) .tpl-thumb{background:linear-gradient(135deg,var(--n-100),var(--n-200))}
+  .tpl-card:nth-child(6) .tpl-thumb{background:linear-gradient(135deg,var(--danger-light),#FFD1CE)}
+  .mini-task{
+    background:rgba(255,255,255,.85);backdrop-filter:blur(4px);
+    border-radius:var(--r-sm);padding:8px 12px;font-size:12px;color:var(--text);
+    display:flex;align-items:center;gap:8px;
+  }
+  .mini-task .mp{width:8px;height:8px;border-radius:50%;background:var(--brand-600)}
+  .mini-task.d .mp{background:var(--success)}
+  .mini-task.d{text-decoration:line-through;color:var(--text-subtlest)}
+  .tpl-meta{padding:18px 20px}
+  .tpl-tag{
+    font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;
+    color:var(--brand-700);margin-bottom:6px;display:block;
+  }
+  .tpl-name{font-family:var(--font-display);font-size:17px;font-weight:600;color:var(--text);margin:0 0 4px}
+  .tpl-desc{font-size:13px;color:var(--text-subtlest);margin:0;line-height:1.5}
+
+  /* ===== Stats ===== */
+  .stats-bg{background:var(--bg-inverse);color:#fff}
+  .stats-bg .section-title{color:#fff}
+  .stats-bg .section-sub{color:rgba(255,255,255,.7)}
+  .stats-bg .section-eyebrow{color:var(--brand-300)}
+  .stats-grid{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:32px;
+    margin-top:48px;
+  }
+  .stat-big{
+    text-align:center;padding:32px 16px;
+    border:1px solid rgba(255,255,255,.08);border-radius:var(--r-xl);
+    background:rgba(255,255,255,.03);
+  }
+  .stat-big .n{
+    font-family:var(--font-display);font-size:56px;font-weight:700;
+    line-height:1;letter-spacing:-0.03em;
+    background:linear-gradient(135deg,var(--brand-300),#fff);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .stat-big .l{font-size:14px;color:rgba(255,255,255,.7);margin-top:12px}
+
+  /* ===== Final CTA ===== */
+  .cta-section{padding:120px 0}
+  .cta{
+    background:linear-gradient(135deg,var(--brand-600) 0%,var(--brand-800) 100%);
+    color:#fff;border-radius:var(--r-3xl);
+    padding:80px 40px;text-align:center;
+    box-shadow:var(--sh-modal);
+    position:relative;overflow:hidden;
+  }
+  .cta::before{
+    content:'';position:absolute;inset:-50%;
+    background:radial-gradient(circle, rgba(255,255,255,.1) 0%, transparent 50%);
+    pointer-events:none;
+  }
+  .cta-inner{position:relative;z-index:1}
+  .cta-title{
+    font-family:var(--font-display);font-size:56px;line-height:1.05;
+    font-weight:700;margin:0 0 20px;letter-spacing:-0.03em;
+  }
+  .cta-title .it{font-style:italic;color:var(--brand-200)}
+  .cta-sub{font-size:18px;color:rgba(255,255,255,.85);margin:0 auto 36px;max-width:560px}
+  .cta .btn-primary{background:#fff;color:var(--brand-700)}
+  .cta .btn-primary:hover{background:var(--brand-50);color:var(--brand-800);box-shadow:0 12px 24px rgba(0,0,0,.2)}
+  .cta .btn-outline{background:transparent;color:#fff;border-color:rgba(255,255,255,.3)}
+  .cta .btn-outline:hover{background:rgba(255,255,255,.1);color:#fff;border-color:rgba(255,255,255,.5)}
+
+  /* ===== Footer ===== */
+  footer{
+    padding:64px 0 40px;border-top:1px solid var(--border-subtle);
+    background:var(--bg);
+  }
+  .foot-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px}
+  .foot-col h4{font-size:13px;font-weight:700;color:var(--text);margin:0 0 16px;text-transform:uppercase;letter-spacing:.06em}
+  .foot-col ul{list-style:none;padding:0;margin:0;display:grid;gap:10px}
+  .foot-col a{color:var(--text-subtle);font-size:14px}
+  .foot-col a:hover{color:var(--text)}
+  .foot-tag{font-size:14px;color:var(--text-subtle);margin:12px 0 16px;line-height:1.55;max-width:280px}
+  .foot-bottom{
+    border-top:1px solid var(--border-subtle);padding-top:24px;
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;
+    font-size:13px;color:var(--text-subtlest);
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 1024px){
+    .features{grid-template-columns:repeat(2,1fr)}
+    .stats-grid{grid-template-columns:repeat(2,1fr)}
+    .tpl-grid{grid-template-columns:repeat(2,1fr)}
+    .device-body{grid-template-columns:1fr}
+    .app-main{border-right:none;border-bottom:1px solid var(--border-subtle)}
+    h1.hero-title{font-size:64px}
+    .section-title{font-size:40px}
+    .cta-title{font-size:42px}
+    .foot-grid{grid-template-columns:1fr 1fr}
+  }
+  @media (max-width: 720px){
+    .nav-links{display:none}
+    .hero{padding:64px 0 0}
+    h1.hero-title{font-size:42px;letter-spacing:-0.025em}
+    .hero-sub{font-size:17px}
+    .hero-visual{margin-top:48px;padding-bottom:64px}
+    section{padding:80px 0}
+    .section-title{font-size:30px}
+    .section-sub{font-size:16px}
+    .features{grid-template-columns:1fr}
+    .stats-grid{grid-template-columns:1fr 1fr}
+    .stat-big .n{font-size:42px}
+    .tpl-grid{grid-template-columns:1fr}
+    .demo-wrap{padding:40px 24px}
+    .demo-title{font-size:26px}
+    .cta{padding:56px 24px}
+    .cta-title{font-size:32px}
+    .foot-grid{grid-template-columns:1fr 1fr;gap:32px}
+    .app-main{padding:24px}
+    .app-side{padding:24px}
+    .press-row{gap:24px}
+    .press-row .item{font-size:16px}
+  }
+  @media (max-width: 420px){
+    h1.hero-title{font-size:34px}
+    .stats-grid{grid-template-columns:1fr}
+    .foot-grid{grid-template-columns:1fr}
+    .hero-meta{gap:12px;font-size:12px}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== Nav ===== -->
+<header class="nav">
+  <div class="container nav-inner">
+    <a href="#" class="logo" aria-label="Tempo">
+      <img src="Resources/Logo.jpg" alt="Tempo">
+      <span class="logo-text">Tempo</span>
+    </a>
+    <nav class="nav-links">
+      <a href="#features">ฟีเจอร์</a>
+      <a href="#templates">เทมเพลต</a>
+      <a href="#demo">เดโม่</a>
+      <a href="PRD-Personal-Task-App-MVP.md">เอกสาร</a>
+    </nav>
+    <div class="nav-spacer">
+      <a class="btn btn-subtle btn-sm" href="index.html">เข้าสู่ระบบ</a>
+      <a class="btn btn-primary btn-sm" href="index.html">เริ่มใช้ฟรี</a>
+    </div>
+  </div>
+</header>
+
+<!-- ===== Hero (centered, Todoist-style) ===== -->
+<section class="hero">
+  <div class="container hero-inner">
+    <span class="eyebrow"><span class="dot"></span> Single-file MVP · v3.0</span>
+    <h1 class="hero-title">
+      ความ<span class="accent">เรียบง่าย</span>,<br>ที่ใช้งานได้จริง
+    </h1>
+    <p class="hero-sub">
+      ร่วมกับนักพัฒนาที่เชื่อว่า task list ที่ดีไม่ต้องการ backend, framework
+      หรือ build step — แค่ HTML ไฟล์เดียว เปิดในเบราว์เซอร์ก็ใช้งานได้
+    </p>
+    <div class="hero-ctas">
+      <a class="btn btn-primary btn-lg" href="index.html">เริ่มใช้ฟรี →</a>
+      <a class="btn btn-outline btn-lg" href="#demo">▶ ดูเดโม่</a>
+    </div>
+    <div class="hero-meta">
+      <span><span class="check">✓</span> 0 dependency</span>
+      <span><span class="check">✓</span> ≤ 350 บรรทัด</span>
+      <span><span class="check">✓</span> Mobile-ready</span>
+      <span><span class="check">✓</span> ไม่ต้องสมัคร</span>
+    </div>
+  </div>
+
+  <!-- Visual mockup -->
+  <div class="hero-visual">
+    <div class="container">
+      <div class="device" aria-hidden="true">
+        <div class="device-bar">
+          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+          <span class="device-url">tempo.local / index.html</span>
+          <span style="width:60px"></span>
+        </div>
+        <div class="device-body">
+          <div class="app-main">
+            <h3>วันนี้</h3>
+            <div class="sub">4 งานค้าง · 1 เสร็จแล้ว</div>
+            <div class="app-input">
+              <input value="Review pull request #482" readonly>
+              <button class="btn btn-primary btn-sm">เพิ่ม</button>
+            </div>
+            <ul class="task-list">
+              <li class="task dragging">
+                <span class="grip">≡</span>
+                <span class="pill inprogress">In progress</span>
+                <span class="title">Write PRD v3.0</span>
+                <button class="x">×</button>
+              </li>
+              <li class="task">
+                <span class="grip">≡</span>
+                <span class="pill todo">Todo</span>
+                <span class="title">Set up GitHub Pages deploy</span>
+                <button class="x">×</button>
+              </li>
+              <li class="task">
+                <span class="grip">≡</span>
+                <span class="pill todo">Todo</span>
+                <span class="title">Add touch drag fallback</span>
+                <button class="x">×</button>
+              </li>
+              <li class="task done">
+                <span class="grip">≡</span>
+                <span class="pill done">Done</span>
+                <span class="title">Sketch wireframe</span>
+                <button class="x">×</button>
+              </li>
+              <li class="task">
+                <span class="grip">≡</span>
+                <span class="pill todo">Todo</span>
+                <span class="title">เขียน smoke test 7 AC</span>
+                <button class="x">×</button>
+              </li>
+            </ul>
+          </div>
+          <div class="app-side">
+            <div class="stat-card">
+              <div class="lab">งานสัปดาห์นี้</div>
+              <div class="num">23</div>
+              <div class="delta">↑ 12% จากสัปดาห์ก่อน</div>
+              <div class="mini-bar"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+            </div>
+            <div class="stat-card">
+              <div class="lab">เสร็จแล้ว</div>
+              <div class="num">17</div>
+              <div class="delta">73.9% completion rate</div>
+            </div>
+            <div class="stat-card" style="background:var(--brand-600);color:#fff;border-color:var(--brand-700)">
+              <div class="lab" style="color:rgba(255,255,255,.8)">เวลาเฉลี่ยที่ใช้</div>
+              <div class="num" style="color:#fff">2.4 ชม.</div>
+              <div class="delta" style="color:var(--brand-100)">ต่องาน</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Press / Social proof strip ===== -->
+<section class="press" style="padding:48px 0">
+  <div class="container">
+    <div class="press-head">⭐⭐⭐⭐⭐ <span class="stars"></span> ที่นักพัฒนาเลือกใช้ในปี 2026</div>
+    <div class="press-row">
+      <span class="item">"Hacker News"</span>
+      <span class="item">Indie Hackers</span>
+      <span class="item">DEV.to</span>
+      <span class="item">CSS-Tricks</span>
+      <span class="item">Smashing Mag</span>
+      <span class="item">Awwwards</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Features (4 col) ===== -->
+<section id="features" class="features-bg">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow">ฟีเจอร์</div>
+      <h2 class="section-title">ทุกอย่างที่จำเป็น <span class="it">ไม่มีอะไรเกิน</span></h2>
+      <p class="section-sub">
+        คัดเฉพาะฟีเจอร์ที่ใช้จริงทุกวัน ไม่มี notification spam ไม่มี gamification
+        ไม่มี AI ที่บังคับให้ใช้ — แค่ task list ที่ทำงานได้
+      </p>
+    </div>
+
+    <div class="features">
+      <div class="feature f-1">
+        <div class="feat-icon">+</div>
+        <h3 class="feat-title">เพิ่ม task ทันใจ</h3>
+        <p class="feat-desc">พิมพ์ + กด Enter task ใหม่ขึ้นบนสุดทันที บันทึก localStorage แบบ real-time</p>
+      </div>
+      <div class="feature f-2">
+        <div class="feat-icon">⟳</div>
+        <h3 class="feat-title">3 status หมุนวน</h3>
+        <p class="feat-desc">คลิก pill เพื่อหมุน Todo → In Progress → Done สีตาม Jira semantic palette</p>
+      </div>
+      <div class="feature f-3">
+        <div class="feat-icon">≡</div>
+        <h3 class="feat-title">Drag & Drop</h3>
+        <p class="feat-desc">HTML5 native API + pointer fallback ลากบน touch ก็ลื่น มี placeholder ขณะลาก</p>
+      </div>
+      <div class="feature f-4">
+        <div class="feat-icon">◐</div>
+        <h3 class="feat-title">ข้อมูลคงอยู่เสมอ</h3>
+        <p class="feat-desc">บันทึก localStorage ทุก state change มี try/catch กัน corrupt fallback อัตโนมัติ</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Demo / Video ===== -->
+<section id="demo">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow">เดโม่</div>
+      <h2 class="section-title">แอบดู <span class="it">Tempo</span> ในการใช้งาน</h2>
+      <p class="section-sub">วิดีโอ 90 วินาทีโชว์ทุกฟีเจอร์ที่ทำใน 30 นาที</p>
+    </div>
+
+    <div class="demo-wrap">
+      <div class="demo-frame">
+        <video
+          src="Resources/Demo.mp4"
+          controls
+          playsinline
+          preload="metadata"
+          poster=""
+        ></video>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Templates / Use cases ===== -->
+<section id="templates" class="features-bg">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow">ตัวอย่างการใช้</div>
+      <h2 class="section-title">เริ่มจาก <span class="it">เทมเพลต</span> ที่คุ้นเคย</h2>
+      <p class="section-sub">ใช้เป็นแรงบันดาลใจในการจัดระเบียบ task list ของคุณ</p>
+    </div>
+
+    <div class="tpl-tabs">
+      <button class="tpl-tab active">งาน</button>
+      <button class="tpl-tab">ส่วนตัว</button>
+      <button class="tpl-tab">เรียน</button>
+      <button class="tpl-tab">ทีม</button>
+      <button class="tpl-tab">การตลาด</button>
+      <button class="tpl-tab">ลูกค้า</button>
+    </div>
+
+    <div class="tpl-grid">
+      <div class="tpl-card">
+        <div class="tpl-thumb">
+          <div class="mini-task d"><span class="mp"></span> Stand-up meeting</div>
+          <div class="mini-task"><span class="mp"></span> Review PRs</div>
+          <div class="mini-task"><span class="mp"></span> Ship feature flag</div>
+        </div>
+        <div class="tpl-meta">
+          <span class="tpl-tag">Engineering</span>
+          <h3 class="tpl-name">Sprint daily</h3>
+          <p class="tpl-desc">งานประจำวันสำหรับ developer ในรอบ sprint</p>
+        </div>
+      </div>
+
+      <div class="tpl-card">
+        <div class="tpl-thumb">
+          <div class="mini-task d"><span class="mp"></span> Customer interview</div>
+          <div class="mini-task"><span class="mp"></span> Draft user story</div>
+          <div class="mini-task"><span class="mp"></span> Roadmap review</div>
+        </div>
+        <div class="tpl-meta">
+          <span class="tpl-tag">Product</span>
+          <h3 class="tpl-name">Product Manager weekly</h3>
+          <p class="tpl-desc">งาน discovery + roadmap ที่ต้องทำทุกสัปดาห์</p>
+        </div>
+      </div>
+
+      <div class="tpl-card">
+        <div class="tpl-thumb">
+          <div class="mini-task"><span class="mp"></span> ทำ wireframe</div>
+          <div class="mini-task d"><span class="mp"></span> รับ feedback</div>
+          <div class="mini-task"><span class="mp"></span> Export Figma assets</div>
+        </div>
+        <div class="tpl-meta">
+          <span class="tpl-tag">Design</span>
+          <h3 class="tpl-name">Designer's day</h3>
+          <p class="tpl-desc">checklist สำหรับ designer ที่ทำงาน sprint รอบสั้น</p>
+        </div>
+      </div>
+
+      <div class="tpl-card">
+        <div class="tpl-thumb">
+          <div class="mini-task"><span class="mp"></span> เขียน blog draft</div>
+          <div class="mini-task d"><span class="mp"></span> Reply email</div>
+          <div class="mini-task"><span class="mp"></span> Plan content</div>
+        </div>
+        <div class="tpl-meta">
+          <span class="tpl-tag">Solo</span>
+          <h3 class="tpl-name">Freelancer focus</h3>
+          <p class="tpl-desc">รวม deep work + admin task ในที่เดียว</p>
+        </div>
+      </div>
+
+      <div class="tpl-card">
+        <div class="tpl-thumb">
+          <div class="mini-task"><span class="mp"></span> Standup 9:00</div>
+          <div class="mini-task"><span class="mp"></span> Code review</div>
+          <div class="mini-task d"><span class="mp"></span> Deploy staging</div>
+        </div>
+        <div class="tpl-meta">
+          <span class="tpl-tag">DevOps</span>
+          <h3 class="tpl-name">DevOps shift</h3>
+          <p class="tpl-desc">งาน on-call + deployment ในกะเดียว</p>
+        </div>
+      </div>
+
+      <div class="tpl-card">
+        <div class="tpl-thumb">
+          <div class="mini-task"><span class="mp"></span> อ่าน paper 1 ฉบับ</div>
+          <div class="mini-task"><span class="mp"></span> ทำการบ้าน</div>
+          <div class="mini-task d"><span class="mp"></span> รีวิวบทเรียน</div>
+        </div>
+        <div class="tpl-meta">
+          <span class="tpl-tag">Study</span>
+          <h3 class="tpl-name">Student's daily</h3>
+          <p class="tpl-desc">checklist สำหรับนักเรียน-นักศึกษาที่อยากโฟกัส</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Stats ===== -->
+<section class="stats-bg">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow">ตัวเลขที่สำคัญ</div>
+      <h2 class="section-title" style="color:#fff">น้อยลง <span class="it" style="color:var(--brand-300)">เพื่อให้ทำได้มากขึ้น</span></h2>
+      <p class="section-sub">การออกแบบบนหลักการ "ทำเฉพาะที่จำเป็น" ทำให้ Tempo เบาแต่ใช้ได้</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-big">
+        <div class="n">30<span style="font-size:.4em;letter-spacing:0">นาที</span></div>
+        <div class="l">จาก 0 ถึง deploy</div>
+      </div>
+      <div class="stat-big">
+        <div class="n">1</div>
+        <div class="l">ไฟล์ HTML ทั้งหมด</div>
+      </div>
+      <div class="stat-big">
+        <div class="n">0</div>
+        <div class="l">dependency / build step</div>
+      </div>
+      <div class="stat-big">
+        <div class="n">7/7</div>
+        <div class="l">acceptance criteria ผ่าน</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Final CTA ===== -->
+<section class="cta-section">
+  <div class="container">
+    <div class="cta">
+      <div class="cta-inner">
+        <h2 class="cta-title">เริ่ม <span class="it">วันนี้</span>,<br>ไม่ต้องรอจนพรุ่งนี้</h2>
+        <p class="cta-sub">โหลดไฟล์เดียว เปิดในเบราว์เซอร์ จดได้เลย — ไม่มีล็อกอิน ไม่มีค่าใช้จ่าย</p>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+          <a class="btn btn-primary btn-lg" href="index.html">เปิดแอป →</a>
+          <a class="btn btn-outline btn-lg" href="PRD-Personal-Task-App-MVP.md">อ่าน PRD</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== Footer ===== -->
+<footer>
+  <div class="container">
+    <div class="foot-grid">
+      <div class="foot-col">
+        <a href="#" class="logo logo-footer" aria-label="Tempo">
+          <img src="Resources/Logo.jpg" alt="Tempo">
+          <span class="logo-text">Tempo</span>
+        </a>
+        <p class="foot-tag">Personal task app ในไฟล์ HTML ไฟล์เดียว — สร้างขึ้นด้วยหลักการ "เรียบง่าย แต่ใช้ได้จริง"</p>
+      </div>
+      <div class="foot-col">
+        <h4>ผลิตภัณฑ์</h4>
+        <ul>
+          <li><a href="#features">ฟีเจอร์</a></li>
+          <li><a href="#templates">เทมเพลต</a></li>
+          <li><a href="#demo">เดโม่</a></li>
+          <li><a href="index.html">เปิดแอป</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h4>เอกสาร</h4>
+        <ul>
+          <li><a href="PRD-Personal-Task-App-MVP.md">PRD</a></li>
+          <li><a href="#">Build plan</a></li>
+          <li><a href="#">Acceptance criteria</a></li>
+          <li><a href="#">Changelog</a></li>
+        </ul>
+      </div>
+      <div class="foot-col">
+        <h4>ทรัพยากร</h4>
+        <ul>
+          <li><a href="#">GitHub</a></li>
+          <li><a href="#">Twitter / X</a></li>
+          <li><a href="#">RSS feed</a></li>
+          <li><a href="#">License (MIT)</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Tempo · Made with care · v3.0</span>
+      <span>Owner: Suthon (DevOps) · 2026-04-28</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
