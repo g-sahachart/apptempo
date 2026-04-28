@@ -1,0 +1,468 @@
+{
+  "name": "Jira Design System",
+  "version": "1.0.0",
+  "description": "Design System tokens extracted from Jira / Atlassian Design System (atlassian.design)",
+  "source": "https://www.atlassian.com/software/jira",
+  "lastUpdated": "2026-04-28",
+
+  "colors": {
+    "brand": {
+      "primary": {
+        "50":  { "value": "#E9F2FF", "description": "Lightest blue tint" },
+        "100": { "value": "#CCE0FF" },
+        "200": { "value": "#85B8FF" },
+        "300": { "value": "#579DFF" },
+        "400": { "value": "#388BFF" },
+        "500": { "value": "#1D7AFC", "description": "Primary brand blue (Jira Blue)" },
+        "600": { "value": "#0C66E4", "description": "Default CTA / Link" },
+        "700": { "value": "#0055CC" },
+        "800": { "value": "#09326C" },
+        "900": { "value": "#082145" }
+      },
+      "jira": {
+        "value": "#2684FF",
+        "description": "Jira product mark blue"
+      },
+      "atlassian": {
+        "value": "#0052CC",
+        "description": "Atlassian corporate blue"
+      }
+    },
+    "neutral": {
+      "0":    { "value": "#FFFFFF", "description": "White / surface" },
+      "50":   { "value": "#F7F8F9" },
+      "100":  { "value": "#F1F2F4" },
+      "200":  { "value": "#DCDFE4" },
+      "300":  { "value": "#B3B9C4" },
+      "400":  { "value": "#8590A2" },
+      "500":  { "value": "#758195" },
+      "600":  { "value": "#626F86" },
+      "700":  { "value": "#44546F", "description": "Default body text" },
+      "800":  { "value": "#2C3E5D" },
+      "900":  { "value": "#172B4D", "description": "Heading / strong text" },
+      "1000": { "value": "#091E42", "description": "Darkest neutral" }
+    },
+    "semantic": {
+      "success": {
+        "light":   { "value": "#DCFFF1" },
+        "default": { "value": "#22A06B", "description": "Success / Done" },
+        "dark":    { "value": "#216E4E" }
+      },
+      "warning": {
+        "light":   { "value": "#FFF7D6" },
+        "default": { "value": "#E2B203", "description": "Warning / In review" },
+        "dark":    { "value": "#7F5F01" }
+      },
+      "danger": {
+        "light":   { "value": "#FFECEB" },
+        "default": { "value": "#CA3521", "description": "Error / Blocked" },
+        "dark":    { "value": "#AE2E24" }
+      },
+      "info": {
+        "light":   { "value": "#E9F2FF" },
+        "default": { "value": "#0C66E4" },
+        "dark":    { "value": "#0055CC" }
+      },
+      "discovery": {
+        "light":   { "value": "#F3F0FF" },
+        "default": { "value": "#8270DB", "description": "New / Discovery" },
+        "dark":    { "value": "#5E4DB2" }
+      }
+    },
+    "background": {
+      "default":   { "value": "#FFFFFF" },
+      "subtle":    { "value": "#F7F8F9" },
+      "sunken":    { "value": "#F1F2F4" },
+      "raised":    { "value": "#FFFFFF" },
+      "overlay":   { "value": "#FFFFFF" },
+      "inverse":   { "value": "#172B4D" },
+      "brand":     { "value": "#0C66E4" },
+      "brandHover":{ "value": "#0055CC" }
+    },
+    "text": {
+      "default":   { "value": "#172B4D" },
+      "subtle":    { "value": "#44546F" },
+      "subtlest":  { "value": "#626F86" },
+      "disabled":  { "value": "#8590A2" },
+      "inverse":   { "value": "#FFFFFF" },
+      "brand":     { "value": "#0C66E4" },
+      "link":      { "value": "#0C66E4" },
+      "linkHover": { "value": "#0055CC" }
+    },
+    "border": {
+      "default":  { "value": "#DCDFE4" },
+      "subtle":   { "value": "#F1F2F4" },
+      "bold":     { "value": "#8590A2" },
+      "focused":  { "value": "#388BFF" },
+      "brand":    { "value": "#0C66E4" }
+    },
+    "statusLabels": {
+      "todo":       { "value": "#DCDFE4", "textColor": "#44546F" },
+      "inProgress": { "value": "#CCE0FF", "textColor": "#0055CC" },
+      "inReview":   { "value": "#FFF7D6", "textColor": "#7F5F01" },
+      "done":       { "value": "#DCFFF1", "textColor": "#216E4E" },
+      "blocked":    { "value": "#FFECEB", "textColor": "#AE2E24" }
+    }
+  },
+
+  "typography": {
+    "fontFamilies": {
+      "sans":    { "value": "'Charlie Display', 'Charlie Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, 'Helvetica Neue', sans-serif" },
+      "body":    { "value": "'Charlie Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" },
+      "display": { "value": "'Charlie Display', -apple-system, BlinkMacSystemFont, sans-serif" },
+      "mono":    { "value": "'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace" }
+    },
+    "fontWeights": {
+      "regular":  { "value": 400 },
+      "medium":   { "value": 500 },
+      "semibold": { "value": 600 },
+      "bold":     { "value": 700 }
+    },
+    "fontSizes": {
+      "xs":   { "value": "11px" },
+      "sm":   { "value": "12px" },
+      "md":   { "value": "14px", "description": "Default body" },
+      "lg":   { "value": "16px" },
+      "xl":   { "value": "20px" },
+      "2xl":  { "value": "24px" },
+      "3xl":  { "value": "29px" },
+      "4xl":  { "value": "35px" },
+      "5xl":  { "value": "48px" },
+      "6xl":  { "value": "60px", "description": "Hero display" }
+    },
+    "lineHeights": {
+      "tight":   { "value": 1.1 },
+      "snug":    { "value": 1.25 },
+      "normal":  { "value": 1.5 },
+      "relaxed": { "value": 1.65 }
+    },
+    "letterSpacing": {
+      "tight":  { "value": "-0.02em" },
+      "normal": { "value": "0em" },
+      "wide":   { "value": "0.02em" }
+    },
+    "textStyles": {
+      "heroDisplay": {
+        "fontFamily":    "{typography.fontFamilies.display}",
+        "fontSize":      "60px",
+        "fontWeight":    700,
+        "lineHeight":    1.1,
+        "letterSpacing": "-0.02em",
+        "description":   "Hero headline e.g. 'Focus on outcomes, not admin'"
+      },
+      "h1": {
+        "fontSize":   "35px",
+        "fontWeight": 700,
+        "lineHeight": 1.2,
+        "letterSpacing": "-0.01em"
+      },
+      "h2": {
+        "fontSize":   "29px",
+        "fontWeight": 700,
+        "lineHeight": 1.25
+      },
+      "h3": {
+        "fontSize":   "24px",
+        "fontWeight": 600,
+        "lineHeight": 1.3
+      },
+      "h4": {
+        "fontSize":   "20px",
+        "fontWeight": 600,
+        "lineHeight": 1.35
+      },
+      "h5": {
+        "fontSize":   "16px",
+        "fontWeight": 600,
+        "lineHeight": 1.4
+      },
+      "h6": {
+        "fontSize":   "14px",
+        "fontWeight": 600,
+        "lineHeight": 1.45
+      },
+      "bodyLarge": {
+        "fontSize":   "16px",
+        "fontWeight": 400,
+        "lineHeight": 1.5
+      },
+      "body": {
+        "fontSize":   "14px",
+        "fontWeight": 400,
+        "lineHeight": 1.5
+      },
+      "bodySmall": {
+        "fontSize":   "12px",
+        "fontWeight": 400,
+        "lineHeight": 1.4
+      },
+      "caption": {
+        "fontSize":   "11px",
+        "fontWeight": 500,
+        "lineHeight": 1.4,
+        "letterSpacing": "0.02em",
+        "textTransform": "uppercase"
+      },
+      "code": {
+        "fontFamily": "{typography.fontFamilies.mono}",
+        "fontSize":   "13px",
+        "fontWeight": 400
+      }
+    }
+  },
+
+  "spacing": {
+    "scale": "4px base — multiples of 4 with half-step at 2px",
+    "tokens": {
+      "0":   { "value": "0px" },
+      "025": { "value": "2px" },
+      "050": { "value": "4px" },
+      "075": { "value": "6px" },
+      "100": { "value": "8px" },
+      "150": { "value": "12px" },
+      "200": { "value": "16px" },
+      "250": { "value": "20px" },
+      "300": { "value": "24px" },
+      "400": { "value": "32px" },
+      "500": { "value": "40px" },
+      "600": { "value": "48px" },
+      "800": { "value": "64px" },
+      "1000":{ "value": "80px" },
+      "1200":{ "value": "96px" }
+    }
+  },
+
+  "radii": {
+    "none":   { "value": "0px" },
+    "xs":     { "value": "3px" },
+    "sm":     { "value": "4px" },
+    "md":     { "value": "6px", "description": "Default — buttons, inputs, cards" },
+    "lg":     { "value": "8px" },
+    "xl":     { "value": "12px" },
+    "2xl":    { "value": "16px" },
+    "circle": { "value": "9999px", "description": "Avatar / pill / badge" }
+  },
+
+  "shadows": {
+    "none":    { "value": "none" },
+    "raised":  { "value": "0 1px 1px rgba(9, 30, 66, 0.25), 0 0 1px rgba(9, 30, 66, 0.31)" },
+    "overlay": { "value": "0 4px 8px -2px rgba(9, 30, 66, 0.25), 0 0 1px rgba(9, 30, 66, 0.31)" },
+    "overflow":{ "value": "0 8px 12px rgba(9, 30, 66, 0.15), 0 0 1px rgba(9, 30, 66, 0.31)" },
+    "modal":   { "value": "0 20px 32px -8px rgba(9, 30, 66, 0.25), 0 0 1px rgba(9, 30, 66, 0.31)" },
+    "focus":   { "value": "0 0 0 2px #388BFF" }
+  },
+
+  "borders": {
+    "width": {
+      "none":   { "value": "0px" },
+      "thin":   { "value": "1px" },
+      "medium": { "value": "2px" },
+      "thick":  { "value": "3px" }
+    },
+    "style": {
+      "solid":  { "value": "solid" },
+      "dashed": { "value": "dashed" }
+    }
+  },
+
+  "motion": {
+    "duration": {
+      "instant": { "value": "0ms" },
+      "fast":    { "value": "100ms" },
+      "medium":  { "value": "200ms" },
+      "slow":    { "value": "300ms" },
+      "slower":  { "value": "500ms" }
+    },
+    "easing": {
+      "standard":   { "value": "cubic-bezier(0.4, 0.0, 0.2, 1)" },
+      "decelerate": { "value": "cubic-bezier(0.0, 0.0, 0.2, 1)" },
+      "accelerate": { "value": "cubic-bezier(0.4, 0.0, 1, 1)" }
+    }
+  },
+
+  "breakpoints": {
+    "xs": { "value": "0px",    "description": "Mobile" },
+    "sm": { "value": "576px",  "description": "Large mobile" },
+    "md": { "value": "768px",  "description": "Tablet" },
+    "lg": { "value": "1024px", "description": "Laptop" },
+    "xl": { "value": "1280px", "description": "Desktop" },
+    "2xl":{ "value": "1440px", "description": "Wide desktop" }
+  },
+
+  "zIndex": {
+    "base":     { "value": 0 },
+    "dropdown": { "value": 100 },
+    "sticky":   { "value": 200 },
+    "overlay":  { "value": 300 },
+    "modal":    { "value": 400 },
+    "popover":  { "value": 500 },
+    "tooltip":  { "value": 600 },
+    "toast":    { "value": 700 }
+  },
+
+  "components": {
+    "button": {
+      "base": {
+        "fontFamily":   "{typography.fontFamilies.body}",
+        "fontWeight":   500,
+        "borderRadius": "{radii.md}",
+        "transition":   "all {motion.duration.medium} {motion.easing.standard}"
+      },
+      "sizes": {
+        "small": {
+          "height":     "24px",
+          "paddingX":   "8px",
+          "fontSize":   "12px"
+        },
+        "medium": {
+          "height":     "32px",
+          "paddingX":   "12px",
+          "fontSize":   "14px"
+        },
+        "large": {
+          "height":     "40px",
+          "paddingX":   "16px",
+          "fontSize":   "16px"
+        }
+      },
+      "variants": {
+        "primary": {
+          "background":      "#0C66E4",
+          "backgroundHover": "#0055CC",
+          "backgroundActive":"#09326C",
+          "color":           "#FFFFFF",
+          "border":          "none"
+        },
+        "secondary": {
+          "background":      "#F1F2F4",
+          "backgroundHover": "#DCDFE4",
+          "backgroundActive":"#B3B9C4",
+          "color":           "#172B4D",
+          "border":          "none"
+        },
+        "subtle": {
+          "background":      "transparent",
+          "backgroundHover": "#F1F2F4",
+          "color":           "#44546F",
+          "border":          "none"
+        },
+        "danger": {
+          "background":      "#CA3521",
+          "backgroundHover": "#AE2E24",
+          "color":           "#FFFFFF"
+        },
+        "link": {
+          "background":      "transparent",
+          "color":           "#0C66E4",
+          "textDecoration":  "none",
+          "hoverDecoration": "underline"
+        }
+      }
+    },
+    "input": {
+      "height":          "40px",
+      "paddingX":        "12px",
+      "fontSize":        "14px",
+      "background":      "#FFFFFF",
+      "border":          "2px solid #DCDFE4",
+      "borderRadius":    "{radii.sm}",
+      "borderHover":     "2px solid #B3B9C4",
+      "borderFocus":     "2px solid #388BFF",
+      "placeholderColor":"#8590A2"
+    },
+    "card": {
+      "background":   "#FFFFFF",
+      "border":       "1px solid #DCDFE4",
+      "borderRadius": "{radii.lg}",
+      "padding":      "24px",
+      "shadow":       "{shadows.raised}",
+      "shadowHover":  "{shadows.overlay}"
+    },
+    "badge": {
+      "fontSize":     "11px",
+      "fontWeight":   600,
+      "paddingY":     "2px",
+      "paddingX":     "8px",
+      "borderRadius": "{radii.circle}",
+      "textTransform":"uppercase",
+      "letterSpacing":"0.02em"
+    },
+    "tag": {
+      "fontSize":     "12px",
+      "fontWeight":   500,
+      "paddingY":     "2px",
+      "paddingX":     "6px",
+      "borderRadius": "{radii.xs}"
+    },
+    "navigation": {
+      "height":       "56px",
+      "background":   "#FFFFFF",
+      "borderBottom": "1px solid #DCDFE4",
+      "itemPaddingX": "12px",
+      "itemFontSize": "14px",
+      "itemColor":    "#44546F",
+      "itemHoverColor":"#172B4D"
+    },
+    "modal": {
+      "background":   "#FFFFFF",
+      "borderRadius": "{radii.lg}",
+      "padding":      "32px",
+      "shadow":       "{shadows.modal}",
+      "overlayColor": "rgba(9, 30, 66, 0.54)",
+      "maxWidth":     "600px"
+    },
+    "tooltip": {
+      "background":   "#172B4D",
+      "color":        "#FFFFFF",
+      "fontSize":     "12px",
+      "paddingY":     "4px",
+      "paddingX":     "8px",
+      "borderRadius": "{radii.xs}"
+    },
+    "avatar": {
+      "sizes": {
+        "xsmall": "16px",
+        "small":  "24px",
+        "medium": "32px",
+        "large":  "40px",
+        "xlarge": "96px",
+        "xxlarge":"128px"
+      },
+      "borderRadius": "{radii.circle}"
+    }
+  },
+
+  "layout": {
+    "containerMaxWidth": "1280px",
+    "gutter":            "24px",
+    "sectionPaddingY":   "96px",
+    "grid": {
+      "columns": 12,
+      "gap":     "24px"
+    }
+  },
+
+  "iconography": {
+    "sizes": {
+      "small":  "16px",
+      "medium": "24px",
+      "large":  "32px",
+      "xlarge": "48px"
+    },
+    "strokeWidth": "1.5px",
+    "library":     "Atlassian Icons / Atlaskit Icon"
+  },
+
+  "brand": {
+    "name":    "Jira",
+    "tagline": "Focus on outcomes, not admin",
+    "logo": {
+      "primary":   "Jira wordmark + cloud icon",
+      "colorMark": "#2684FF"
+    },
+    "voice": {
+      "tone":   ["Confident", "Empowering", "Practical", "Human"],
+      "values": ["Teamwork", "Transparency", "Outcomes over output"]
+    }
+  }
+}
