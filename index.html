@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tasks</title>
+<title>Tempo</title>
+<link rel="icon" href="logo.jpg" type="image/jpeg">
 <style>
   /* Jira / Atlassian Design System tokens */
   :root {
@@ -45,32 +46,6 @@
     /* Font */
     --font-body: 'Charlie Text', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg:           #161A1D;
-      --bg-sunken:    #101214;
-      --bg-elevated:  #22272B;
-      --text:         #B6C2CF;
-      --text-subtle:  #9FADBC;
-      --text-subtlest:#738496;
-      --text-disabled:#596773;
-      --border:       #2C333A;
-      --border-bold:  #596773;
-      --border-focused:#85B8FF;
-      --brand:        #579DFF;
-      --brand-hover:  #85B8FF;
-      --brand-active: #CCE0FF;
-      --todo-bg: #2C333A; --todo-fg: #9FADBC;
-      --prog-bg: #09326C; --prog-fg: #85B8FF;
-      --done-bg: #164B35; --done-fg: #7EE2B8;
-      --danger:       #F87168;
-      --danger-hover: #FD9891;
-      --drop:         #85B8FF;
-      --sh-raised:  0 1px 1px rgba(0,0,0,0.4), 0 0 1px rgba(0,0,0,0.5);
-      --sh-overlay: 0 4px 8px -2px rgba(0,0,0,0.4), 0 0 1px rgba(0,0,0,0.5);
-      --sh-focus:   0 0 0 2px rgba(133,184,255,0.4);
-    }
-  }
   * { box-sizing: border-box; }
   body {
     margin: 0;
@@ -80,10 +55,24 @@
     -webkit-font-smoothing: antialiased;
   }
   .container { max-width: 1280px; margin: 0 auto; padding: 24px 16px; }
-  h1 {
-    font-size: 24px; margin: 0 0 20px; font-weight: 600;
-    line-height: 1.3; letter-spacing: -0.005em;
+  .brand {
+    display: flex; align-items: center; gap: 12px;
+    margin: 0 0 24px;
+  }
+  .brand .logo {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: var(--sh-raised);
+  }
+  .brand h1 {
+    font-size: 28px; margin: 0; font-weight: 700;
+    line-height: 1.2; letter-spacing: -0.01em;
     color: var(--text);
+    background: linear-gradient(135deg, #2A8CF0 0%, #4FD1B0 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
 
   .input-row {
@@ -231,7 +220,10 @@
 </head>
 <body>
   <div class="container">
-    <h1>Tasks</h1>
+    <div class="brand">
+      <img src="logo.jpg" alt="Tempo" class="logo">
+      <h1>Tempo</h1>
+    </div>
     <div class="input-row">
       <input id="title" type="text" placeholder="เพิ่ม task ใหม่..." autofocus>
       <textarea id="desc" placeholder="รายละเอียด (ไม่บังคับ) — Cmd/Ctrl+Enter เพื่อเพิ่ม" rows="2"></textarea>
