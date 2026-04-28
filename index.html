@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tasks</title>
+<style>
+  :root {
+    --bg: #fafafa;
+    --fg: #1a1a1a;
+    --muted: #888;
+    --card: #fff;
+    --border: #e5e5e5;
+    --accent: #2563eb;
+    --danger: #dc2626;
+    --col-bg: #f1f3f5;
+    --todo-bg: #e5e7eb; --todo-fg: #374151;
+    --prog-bg: #dbeafe; --prog-fg: #1e40af;
+    --done-bg: #d1fae5; --done-fg: #065f46;
+    --drop: #93c5fd;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f0f0f;
+      --fg: #f5f5f5;
+      --muted: #777;
+      --card: #1f1f1f;
+      --border: #2a2a2a;
+      --accent: #3b82f6;
+      --danger: #ef4444;
+      --col-bg: #161616;
+      --todo-bg: #374151; --todo-fg: #d1d5db;
+      --prog-bg: #1e3a8a; --prog-fg: #bfdbfe;
+      --done-bg: #064e3b; --done-fg: #a7f3d0;
+      --drop: #1e40af;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--bg); color: var(--fg); min-height: 100vh;
+  }
+  .container { max-width: 1100px; margin: 0 auto; padding: 20px 14px; }
+  h1 { font-size: 22px; margin: 0 0 16px; font-weight: 600; }
+  .input-row { display: flex; gap: 8px; margin-bottom: 18px; }
+  #title {
+    flex: 1; padding: 10px 14px; font-size: 16px;
+    border: 1px solid var(--border); border-radius: 8px;
+    background: var(--card); color: var(--fg); outline: none;
+  }
+  #title:focus { border-color: var(--accent); }
+  #add {
+    padding: 10px 18px; font-size: 16px; border: none;
+    border-radius: 8px; background: var(--accent); color: #fff; cursor: pointer;
+  }
+  #add:hover { opacity: 0.9; }
+
+  .board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+  @media (max-width: 720px) {
+    .board { grid-template-columns: 1fr; }
+  }
+  .col {
+    background: var(--col-bg);
+    border-radius: 10px;
+    padding: 12px;
+    min-height: 160px;
+    display: flex; flex-direction: column;
+  }
+  .col.drag-over { outline: 2px dashed var(--drop); outline-offset: -2px; }
+  .col-head {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 10px;
+  }
+  .col-title {
+    font-size: 13px; font-weight: 600;
+    padding: 4px 10px; border-radius: 999px;
+  }
+  .col-title.todo { background: var(--todo-bg); color: var(--todo-fg); }
+  .col-title.in_progress { background: var(--prog-bg); color: var(--prog-fg); }
+  .col-title.done { background: var(--done-bg); color: var(--done-fg); }
+  .count { color: var(--muted); font-size: 12px; }
+
+  .list { list-style: none; margin: 0; padding: 0; flex: 1; min-height: 40px; }
+  .list li {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 10px; background: var(--card);
+    border: 1px solid var(--border); border-radius: 8px;
+    margin-bottom: 8px; user-select: none;
+  }
+  .list li.dragging { opacity: 0.4; }
+  .list li.drop-before { border-top: 3px solid var(--drop); }
+  .list li.drop-after { border-bottom: 3px solid var(--drop); }
+  .handle {
+    cursor: grab; color: var(--muted); font-size: 16px;
+    padding: 2px; touch-action: none; line-height: 1;
+  }
+  .handle:active { cursor: grabbing; }
+  .task-title { flex: 1; font-size: 14px; word-break: break-word; }
+  li.is-done .task-title { text-decoration: line-through; color: var(--muted); }
+  .delete {
+    background: none; border: none; color: var(--muted);
+    font-size: 20px; cursor: pointer; padding: 0 4px; line-height: 1;
+  }
+  .delete:hover { color: var(--danger); }
+  .empty {
+    text-align: center; color: var(--muted);
+    padding: 18px 0; font-size: 13px; font-style: italic;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>Tasks</h1>
+    <div class="input-row">
+      <input id="title" type="text" placeholder="เพิ่ม task ใหม่..." autofocus>
+      <button id="add">Add</button>
+    </div>
+    <div class="board" id="board"></div>
+  </div>
+
+<script>
+  const KEY = "tasks_v1";
+  const STATUSES = ["todo", "in_progress", "done"];
+  const STATUS_LABEL = { todo: "Todo", in_progress: "In Progress", done: "Done" };
+
+  let tasks = load();
+
+  function load() {
+    try {
+      const parsed = JSON.parse(localStorage.getItem(KEY) ?? "[]");
+      return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+      console.warn("tasks_v1 corrupt, falling back to []", e);
+      return [];
+    }
+  }
+  function save() { localStorage.setItem(KEY, JSON.stringify(tasks)); }
+
+  const $board = document.getElementById("board");
+  const $title = document.getElementById("title");
+  const $add = document.getElementById("add");
+
+  function render() {
+    $board.innerHTML = "";
+    for (const status of STATUSES) {
+      const items = tasks.filter(t => t.status === status);
+
+      const col = document.createElement("div");
+      col.className = "col";
+      col.dataset.status = status;
+
+      const head = document.createElement("div");
+      head.className = "col-head";
+      const ctitle = document.createElement("span");
+      ctitle.className = "col-title " + status;
+      ctitle.textContent = STATUS_LABEL[status];
+      const count = document.createElement("span");
+      count.className = "count";
+      count.textContent = items.length;
+      head.append(ctitle, count);
+      col.appendChild(head);
+
+      const ul = document.createElement("ul");
+      ul.className = "list";
+
+      if (items.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = "ว่าง";
+        ul.appendChild(empty);
+      }
+
+      for (const t of items) {
+        const li = document.createElement("li");
+        li.dataset.id = t.id;
+        li.draggable = true;
+        if (t.status === "done") li.classList.add("is-done");
+
+        const handle = document.createElement("span");
+        handle.className = "handle";
+        handle.textContent = "≡";
+
+        const span = document.createElement("span");
+        span.className = "task-title";
+        span.textContent = t.title;
+
+        const del = document.createElement("button");
+        del.className = "delete";
+        del.textContent = "×";
+        del.setAttribute("aria-label", "ลบ");
+        del.addEventListener("click", () => remove(t.id));
+
+        li.append(handle, span, del);
+        attachItemDnD(li, handle);
+        ul.appendChild(li);
+      }
+
+      attachColDnD(col, ul);
+      col.appendChild(ul);
+      $board.appendChild(col);
+    }
+  }
+
+  function add() {
+    const title = $title.value.trim();
+    if (!title) return;
+    tasks.unshift({
+      id: String(Date.now()) + Math.random().toString(36).slice(2, 6),
+      title,
+      status: "todo",
+      createdAt: Date.now(),
+    });
+    $title.value = "";
+    save(); render();
+  }
+
+  function remove(id) {
+    if (!confirm("ลบ task นี้?")) return;
+    tasks = tasks.filter(x => x.id !== id);
+    save(); render();
+  }
+
+  // ---- DnD: between/within columns ----
+  let dragId = null;
+
+  function clearMarkers() {
+    for (const el of $board.querySelectorAll(".drop-before,.drop-after")) {
+      el.classList.remove("drop-before", "drop-after");
+    }
+    for (const el of $board.querySelectorAll(".col.drag-over")) {
+      el.classList.remove("drag-over");
+    }
+  }
+
+  function moveTo(targetStatus, beforeId) {
+    const fromIdx = tasks.findIndex(x => x.id === dragId);
+    if (fromIdx < 0) return;
+    const [moved] = tasks.splice(fromIdx, 1);
+    moved.status = targetStatus;
+
+    if (beforeId) {
+      const i = tasks.findIndex(x => x.id === beforeId);
+      tasks.splice(i >= 0 ? i : tasks.length, 0, moved);
+    } else {
+      // append to end (after last item of that status)
+      let lastIdx = -1;
+      tasks.forEach((t, i) => { if (t.status === targetStatus) lastIdx = i; });
+      tasks.splice(lastIdx + 1, 0, moved);
+    }
+    save();
+  }
+
+  function attachItemDnD(li, handle) {
+    li.addEventListener("dragstart", e => {
+      dragId = li.dataset.id;
+      li.classList.add("dragging");
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", dragId);
+    });
+    li.addEventListener("dragend", () => {
+      li.classList.remove("dragging");
+      clearMarkers();
+      dragId = null;
+    });
+    li.addEventListener("dragover", e => {
+      if (!dragId || li.dataset.id === dragId) return;
+      e.preventDefault();
+      const r = li.getBoundingClientRect();
+      const before = e.clientY < r.top + r.height / 2;
+      clearMarkers();
+      li.classList.add(before ? "drop-before" : "drop-after");
+    });
+    li.addEventListener("drop", e => {
+      e.preventDefault(); e.stopPropagation();
+      if (!dragId || li.dataset.id === dragId) return;
+      const targetStatus = li.closest(".col").dataset.status;
+      const r = li.getBoundingClientRect();
+      const before = e.clientY < r.top + r.height / 2;
+      const beforeId = before ? li.dataset.id : nextSiblingId(li);
+      moveTo(targetStatus, beforeId);
+      clearMarkers(); dragId = null;
+      render();
+    });
+
+    // Touch fallback via pointer events on handle
+    handle.addEventListener("pointerdown", e => {
+      if (e.pointerType === "mouse") return;
+      e.preventDefault();
+      dragId = li.dataset.id;
+      li.classList.add("dragging");
+      handle.setPointerCapture(e.pointerId);
+
+      const onMove = ev => {
+        const target = pickTarget(ev.clientX, ev.clientY);
+        clearMarkers();
+        if (!target) return;
+        target.col.classList.add("drag-over");
+        if (target.beforeEl) target.beforeEl.classList.add("drop-before");
+      };
+      const onUp = ev => {
+        const target = pickTarget(ev.clientX, ev.clientY);
+        if (target) {
+          const beforeId = target.beforeEl ? target.beforeEl.dataset.id : null;
+          moveTo(target.col.dataset.status, beforeId);
+        }
+        li.classList.remove("dragging");
+        clearMarkers();
+        dragId = null;
+        try { handle.releasePointerCapture(e.pointerId); } catch {}
+        handle.removeEventListener("pointermove", onMove);
+        handle.removeEventListener("pointerup", onUp);
+        handle.removeEventListener("pointercancel", onUp);
+        render();
+      };
+      handle.addEventListener("pointermove", onMove);
+      handle.addEventListener("pointerup", onUp);
+      handle.addEventListener("pointercancel", onUp);
+    });
+  }
+
+  function nextSiblingId(li) {
+    const next = li.nextElementSibling;
+    return next && next.dataset.id ? next.dataset.id : null;
+  }
+
+  function attachColDnD(col, ul) {
+    col.addEventListener("dragover", e => {
+      if (!dragId) return;
+      e.preventDefault();
+      col.classList.add("drag-over");
+    });
+    col.addEventListener("dragleave", e => {
+      if (e.target === col) col.classList.remove("drag-over");
+    });
+    col.addEventListener("drop", e => {
+      e.preventDefault();
+      if (!dragId) return;
+      // dropped on column (not on a specific item) → append to end of column
+      moveTo(col.dataset.status, null);
+      clearMarkers(); dragId = null;
+      render();
+    });
+  }
+
+  function pickTarget(x, y) {
+    const cols = $board.querySelectorAll(".col");
+    for (const col of cols) {
+      const r = col.getBoundingClientRect();
+      if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
+        const items = [...col.querySelectorAll("li")].filter(el => el.dataset.id !== dragId);
+        for (const el of items) {
+          const ir = el.getBoundingClientRect();
+          if (y < ir.top + ir.height / 2) return { col, beforeEl: el };
+        }
+        return { col, beforeEl: null };
+      }
+    }
+    return null;
+  }
+
+  $add.addEventListener("click", add);
+  $title.addEventListener("keydown", e => { if (e.key === "Enter") add(); });
+
+  render();
+</script>
+</body>
+</html>
